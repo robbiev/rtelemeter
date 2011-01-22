@@ -12,13 +12,29 @@ require 'soap/wsdlDriver'
 require 'rexml/document'
 
 class Telemeter
-    @@wsdl = 'https://telemeter4tools.services.telenet.be/TelemeterService?wsdl'
+    @@wsdl = 'https://t4t.services.telenet.be/TelemeterService.wsdl'
     def initialize
         @telemeter = SOAP::WSDLDriverFactory.new(@@wsdl).create_rpc_driver
     end
     
     def get_usage(extractor, user, pwd)
-        extractor.extract(@telemeter.getUsage(user, pwd))
+	puts "User: #{user}"
+	usage = @telemeter.retrieveUsage(:UserId => user,:Password => pwd)
+	puts "Measured at: #{usage.ticket.timestamp}"
+	puts "Next update: #{usage.ticket.expiryTimestamp}"
+	puts "Summary: #{usage.stage.description}"
+        extractor.extract(usage)
+    end
+end
+
+class RetrieveUsageRequest
+    attr_reader :UserId, :Password
+    def initialize(user, pwd)
+        @UserId = user
+        @Password = pwd
+    end
+    def UserId
+        @UserID
     end
 end
 
@@ -79,13 +95,8 @@ class TelemeterDataExtractor
     end
     
     def extract(xml_response)
-        @doc = REXML::Document.new(xml_response)
-        
-        check_status()        
-        
-        max_total = @doc.find_first_recursive() { |node| node.name == 'max-up'}.text.to_i
-        total = @doc.find_first_recursive() { |node| node.name == 'up'}.text.to_i
-        TelemeterData.new(total, max_total)
+	stage = xml_response.stage.stageNumber
+        TelemeterData.new(stage.to_i, 9)
     end
     
     private 

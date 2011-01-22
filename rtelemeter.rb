@@ -41,13 +41,14 @@ class SimpleTelemeterClient
     end
     
     def run(user, pwd)
+        #$VERBOSE = $DEBUG = true
         $VERBOSE = nil # TODO Deal with ugly warnings
         telemeter = Telemeter.new
         extractor = TelemeterDataExtractor.new
         data = telemeter.get_usage(extractor, user, pwd)
-        puts "Usage: #{data.usage} of #{data.max_usage} MB"
+        puts "Usage: Stage #{data.usage} of #{data.max_usage} (lower is better)"
         if data.max_usage.to_i != 0
-            puts "[#{('='*(data.usage/(data.max_usage/20)).to_i).ljust(20)}]"
+            puts "[#{('='*(data.usage/(data.max_usage/20.0)).to_i).ljust(20)}]"
         end
     end
 end
@@ -134,9 +135,10 @@ class CommandLineApp
                 SimpleTelemeterClient.new(config.config_location).run(config_data['user'], config.decrypt(config_data['pwd']))
             end
         rescue TelemeterException => ex
+	    puts ex
             if ex.status
                 # let's be smart and help the user.
-                $stderr << StatusMessage.to_english(ex.status) + "\n"
+                $stderr << StatusMessage.to_english(ex.status) 
                 if [StatusMessage::INVALID,StatusMessage::WRONG].include?(ex.status)
                     try_again = false
                     choose do |menu|
@@ -155,7 +157,8 @@ class CommandLineApp
                 $stderr << @@message
             end
         rescue Exception => ex
-            $stderr << ex + "\n"
+            $stderr << ex 
+            $stderr << "\n"
         end
     end
 end
