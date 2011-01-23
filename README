@@ -1,0 +1,7 @@
+Usage
+=====
+Install gems highline and crypt
+chmod +x and ./rtelemeter.rb
+
+Currently it only works for "stage" based (one through nine) subscriptions.
+If you have a volume based subscription, the utility will crash.
