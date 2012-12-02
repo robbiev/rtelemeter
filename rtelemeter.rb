@@ -44,8 +44,7 @@ class SimpleTelemeterClient
         #$VERBOSE = $DEBUG = true
         $VERBOSE = nil # TODO Deal with ugly warnings
         telemeter = Telemeter.new
-        extractor = TelemeterDataExtractor.new
-        data = telemeter.get_usage(extractor, user, pwd)
+        data = telemeter.get_usage(user, pwd)
         puts "Usage: #{data.usage} of #{data.max_usage}" 
         if data.max_usage.to_i != 0
             puts "[#{('='*(data.usage/(data.max_usage/20.0)).to_i).ljust(20)}]"
