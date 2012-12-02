@@ -46,7 +46,7 @@ class SimpleTelemeterClient
         telemeter = Telemeter.new
         extractor = TelemeterDataExtractor.new
         data = telemeter.get_usage(extractor, user, pwd)
-        puts "Usage: Stage #{data.usage} of #{data.max_usage} (lower is better)"
+        puts "Usage: #{data.usage} of #{data.max_usage}" 
         if data.max_usage.to_i != 0
             puts "[#{('='*(data.usage/(data.max_usage/20.0)).to_i).ljust(20)}]"
         end
